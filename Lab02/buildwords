@@ -1,0 +1,12 @@
+#!/bin/bash
+
+grep "<td>.*</td>" | \
+sed -e "s@<td>\(.*\)</td>@\1@g" | \
+sed 's/^\s*//g ' | \
+sed '/^$/d' | \
+sed -n '0~2p' | \
+tr '`' "'" | \
+sed -e "s@<u>\(.\)</u>@\1@g" | \
+tr "[:upper:]" "[:lower:]" | \
+sed "s/,\s\|\s/\n/g"  | \
+sort -u

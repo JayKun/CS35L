@@ -1,0 +1,118 @@
+﻿Name: Jun Kai Ong
+Class: CS 35L Winter 2017
+Professor: Prof Paul Eggert
+Teaching Assistant: Garip Mevlut Turker
+Note: The ←↑→↓ arrows correspond to the arrow keys found on the keyboard
+
+Exercise 1.1
+1. E m a c s SP e x e r 1 . h t m l
+2. C-s SP P U B L I C
+3. C-s SP L a b o r a t o r y
+4. C-s SP s e l f - r e f e r e n t i a l
+5. C-s SP a r r o w
+6. C-e
+7. C-a
+
+
+Exercise 1.2
+1. M-g-g 1 8 C-k
+2. C-S D E L E T E  C-a C-k
+3. C-S < ! C-S  C-S C-SP ↓ ↓ ↓ C-W 
+4. C-S < ! C-b C-b M-z > 
+5. C-S <! C-b C-b C-k
+C-x C-c y
+
+
+Exercise 1.3
+1. C-S A s s i g n m e n t SP 1 M-% Assignment 37 Enter y y q
+2. M-< C-S U T F - 8 M-% US-ASCII Enter y q
+3. M-< C-S < o l > ↑ Enter
+4. C-x C-c y
+
+
+Exercise 1.4
+1. M-> C-r - < ! → C-SP C-e M-w M-g-g 352 Enter C-y
+2. M-> C-r - < ! C-r → C-SP C-e ↓ ↓ M-w M-g-g 300 Enter C-y C-a Del ↑ Del
+3. M-> C-r - < ! C-r C-r → C-SP C-e M-w M-g-g 90 Enter C-y
+4. M-> C-r diff C-a → M-w M-g-g 15 Enter C-y
+5. M-> C-r  - < p  → C-SP C-e M-w M-g-g 337 Enter C-y C-k
+6. C-s < / h t m l > ↓ C-a C-SP M-> Del C-/
+7.  - - > C-r < / h t m l > C-r ↓ < ! - -
+8. M-< C-s < o l > M-% < O l > Enter  ! 
+(“Replaced 7 occurrences” were printed; there are 7 instances of the <ol> tag)
+1. C-x C-c y
+
+
+Exercise 1.5
+1. C-x d ~ Enter + j u n k Enter
+2. Enter C-x C-f h e l l o . c Enter 
+3. Copy and paste code from website
+4. M-x c o m p i l e Enter Backspace Backspace 
+Backspace Backspace Backspace Backspace Backspace
+1. g c c SP - o SP h e l l o  SP  h e l l o . c
+
+
+#include <stdio.h>
+int
+main (void)
+{
+  char n = '\n';
+  char b = '\\';
+  char q = '"';
+  char const *p = "#include <stdio.h>%cint%cmain (void)%c{%c  char n = '%cn';%c  char b = '%c%c';%c  char q = '%c';%c  char const *p = %c%s%c;%c  printf (p, n, n, n, n, b, n, b, b, n, q, n\
+, q, p, q, n, n, n, n);%c  return 0;%c}%c";
+  printf (p, n, n, n, n, b, n, b, b, n, q, n, q, p, q, n, n, n, n);
+  return 0;
+}
+
+
+C-SP M-> M-w C-x-5-f M-> C-y
+ 
+Exercise 1.6
+1. C-x b Enter
+
+
+1. ( r a n d o m ) C-j
+
+
+1. ( s e t q SP x ( r a n d o m ) ) C-j ( s e t q SP y ( r a n d o m ) )C-j
+
+
+1. The product of x and y is 540325035773029306.
+This result is mathematically incorrect since
+the previous evaluation of x and y gave us -1619437349473865658 and 
+830899240560908799 respectively.
+Thus, the number should be a negative number instead of a positive one.
+The reason behind this is overflow. 
+
+
+1. The result this time is 540325035773029306 
+(#o35774754073440065672, #x77f9ec1dc806bba).
+Note the octa and hexa representations of the number.
+ 
+1. The two random numbers are not truly mathematically random. 
+The probability that a number is chosen must be 
+uniformly distributed across all numbers. 
+However, in random, numbers are simply read off 
+a predefined list of numbers that are arranged in such a way 
+to have an even distribution. 
+The computer seeds the random generator using the time 
+the function is being called, in order to jump to different parts of 
+the list and read out seemingly random numbers.
+So in a mathematically sense it is not random 
+since the number generated is correlated to the 
+time at which the function is called. 
+
+
+1. If random is truly random, each number will 
+have an equal probability of being chosen.
+We know that the machines on the server are 64-bit systems.
+By running the most-positive-fixnum command 
+described on the GNU Emacs Lisp reference website,
+we notice that it returns 2^61 - 1 
+while most-negative-fixnum returns -2^61.
+Now, the product of two random numbers
+will be incorrect and experience overflow
+if the product falls away from the range of -2^61 to 2^61 -1. 
+The probability of finding a mathematically incorrect product 
+would thus be 1 - the probability of non-overflow cases.
