@@ -1,0 +1,229 @@
+We first create five different text files with increasing
+number of characters namely t1, t2, t3, t4, t5 and t6. 
+Each file would contain the text
+"CS35L is awesome" but with varying powers of 10. 
+
+Test 1
+Number of characters = 16
+(a)sfrob
+    command: time ./sfrob < t1
+    real    0m0.002s
+    user    0m0.001s
+    sys     0m0.001s
+
+(b)sfrobu
+    command: time ./sfrobu < t1
+    real    0m0.004s
+    user    0m0.001s
+    sys     0m0.001s
+
+(c)sfrobu -f
+    command: time ./sfrobu -f < t1
+    real    0m0.004s
+    user    0m0.000s
+    sys     0m0.001s
+
+(d)sfrobs
+    command: time ./sfrobs < t1
+    real    0m0.009s
+    user    0m0.004s
+    sys     0m0.002s
+
+(e)sfrobs -f
+    command: time ./sfrobs -f < t1
+    real    0m0.006s
+    user    0m0.002s
+    sys     0m0.004s
+
+Test2
+Number of characters = 16*10
+(a)sfrob
+    command: time ./sfrob < t2
+    real    0m0.005s
+    user    0m0.000s
+    sys     0m0.001s
+
+(b)sfrobu
+    command: time ./sfrobu < t2
+    real    0m0.014s
+    user    0m0.000s
+    sys     0m0.002s
+    
+(c)sfrobu -f
+    command: time ./sfrobu -f < t2
+    real    0m0.005s
+    user    0m0.000s
+    sys     0m0.001s
+
+(d)sfrobs
+    command: time ./sfrobs < t2
+    real    0m0.006s
+    user    0m0.003s
+    sys     0m0.003s
+
+
+(e)sfrobs -f
+    command: time ./sfrobs -f < t2
+    real    0m0.005s
+    user    0m0.003s
+    sys     0m0.004s
+
+Test3
+Number of characters = 16*100
+(a)sfrob
+    command: time ./sfrob < t3
+    real    0m0.005s
+    user    0m0.000s
+    sys     0m0.002s
+
+
+(b)sfrobu
+    command: time ./sfrobu < t3
+    real    0m0.005s
+    user    0m0.000s
+    sys     0m0.004s
+
+
+(c)sfrobu -f
+    command: time ./sfrobu -f < t3
+    real    0m0.005s
+    user    0m0.000s
+    sys     0m0.003s
+
+(d)sfrobs
+    command: time ./sfrobs < t3
+    real    0m0.008s
+    user    0m0.002s
+    sys     0m0.004s
+
+(e)sfrobs -f
+    command: time ./sfrobs -f < t3
+    real    0m0.007s
+    user    0m0.002s
+    sys     0m0.003s
+
+Test 4
+Number of characters = 16*1000
+(a)sfrob
+    command: time ./sfrob < t4
+    real    0m0.007s
+    user    0m0.003s
+    sys     0m0.002s
+
+(b)sfrobu
+    command: time ./sfrobu < t4
+    real    0m0.025s
+    user    0m0.004s
+    sys     0m0.018s
+
+(c)sfrobu -f
+    command: time ./sfrobu -f < t4
+    real    0m0.024s
+    user    0m0.005s
+    sys     0m0.017s
+
+(d)sfrobs
+    command: time ./sfrobs < t4
+    real    0m0.010s
+    user    0m0.000s
+    sys     0m0.008s
+
+(e)sfrobs -f
+    command: time ./sfrobs -f < t4
+    real    0m0.011s
+    user    0m0.002s
+    sys     0m0.005s
+
+
+Test 5
+Number of characters = 16*10000
+(a)sfrob
+    command: time ./sfrob < t5
+    real    0m0.045s
+    user    0m0.026s
+    sys     0m0.015s
+
+(b)sfrobu
+    command: time ./sfrobu < t5
+    real    0m0.220s
+    user    0m0.039s
+    sys     0m0.161s
+
+
+(c)sfrobu -f
+    command: time ./sfrobu -f < t5
+    real    0m0.221s
+    user    0m0.041s
+    sys     0m0.175s
+
+(d)sfrobs
+    command: time ./sfrobs < t5
+    real    0m0.107s
+    user    0m0.005s
+    sys     0m0.013s
+
+(e)sfrobs -f
+    command: time ./sfrobs -f < t5
+    real    0m0.037s
+    user    0m0.010s
+    sys     0m0.012s
+
+Test 6
+Number of characters=16*100000
+(a)sfrob
+    command: time ./sfrob < t6
+    real    0m2.260s
+    user    0m0.324s
+    sys     0m0.110s
+
+
+(b)sfrobu
+    command: time ./sfrobu < t6
+    real    0m3.201s
+    user    0m0.396s
+    sys     0m1.628s
+
+
+(c)sfrobu -f
+    command: time ./sfrobu -f < t6
+    real    0m3.001s
+    user    0m0.529s
+    sys     0m1.642s
+
+(d)sfrobs
+    command: time ./sfrobs < t6
+    real    0m2.078s
+    user    0m0.062s
+    sys     0m0.088s
+
+
+(e)sfrobs -f
+    command: time ./sfrobs -f < t6
+    real    0m2.162s
+    user    0m0.101s
+    sys     0m0.088s
+
+Analaysis of all six tests shows that
+the shell script performed better
+overall as it spends the least amount of
+time in system space. This may be due to
+the various optimizations that were involved in
+the design of the utilities.
+
+
+Analaysis of the number of comparison
+between sfrob and sfrobu:
+
+| Lines	| Comparisons |
+| 1	| 3	      |
+| 10 	| 78	      |
+| 100	| 1179	      |
+| 1000	| 16905	      |	
+| 10000	| 217332      |
+| 100000| 2668443     |
+
+Using basic statistics,
+we estimate that the number of comparisons is related
+to the lines by almost a factor of 17.1.
+
+number of comparison = 17.1 * number of lines

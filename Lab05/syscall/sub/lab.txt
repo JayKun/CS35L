@@ -1,0 +1,115 @@
+1. We start by writing the two programs and compiling
+   the two programs: tr2b and trbu
+   commands: gcc -o tr2b tr2b.c
+   	     gcc -o tr2u tr2u.c
+
+2. Since we are required to test the program on a file
+   that is at least 5MB.We first create the file and then
+   perform the two operations mentioned in the specs. We use
+   strace and wc -l to track the number of system calls made
+   for both versions of our program:
+   commands: dd if=/dev/zero of=test.txt bs=5000000 count=1
+   	     (a) Copying from one file to another file
+
+strace -c ./tr2b 'a' 'b' < test.txt > outputba.txt
+results:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 52.59    0.000254           3        77           write
+ 18.43    0.000089           1        79           read
+ 10.56    0.000051           6         9           mmap
+  4.97    0.000024           6         4           mprotect
+  3.52    0.000017           4         4           fstat
+  3.11    0.000015           8         2           open
+  1.86    0.000009           9         1           munmap
+  1.24    0.000006           3         2           close
+  1.24    0.000006           6         1         1 access
+  1.24    0.000006           6         1           execve
+  0.62    0.000003           3         1           brk
+  0.62    0.000003           3         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000483                   182         1 total
+
+strace -c ./tr2u 'a' 'b' < test.txt > outputua.txt	     
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.32    5.423382           1   5000000           write
+ 44.68    4.380379           1   5000002           read
+  0.00    0.000036           5         7           mmap
+  0.00    0.000023           6         4           mprotect
+  0.00    0.000019          10         2           close
+  0.00    0.000012           6         2           open
+  0.00    0.000009           9         1           munmap
+  0.00    0.000007           4         2           fstat
+  0.00    0.000007           7         1         1 access
+  0.00    0.000006           6         1           execve
+  0.00    0.000003           3         1           brk
+  0.00    0.000003           3         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    9.803886              10000024         1 total
+
+Analysis: It is evident that the number of syscalls in
+	  tr2b(182) is much lower than in tr2u(10000024).
+
+	     
+(b) Copying from one file to terminal    
+strace -c ./tr2b 'a' 'b' < test.txt
+Output:	    
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 89.00    0.001805           0      4883           write
+  4.59    0.000093           1        79           read
+  2.22    0.000045           5         9           mmap
+  1.18    0.000024           6         4           mprotect
+  0.84    0.000017           4         4           fstat
+  0.59    0.000012           6         2           open
+  0.44    0.000009           9         1           munmap
+  0.30    0.000006           3         2           close
+  0.30    0.000006           6         1         1 access
+  0.25    0.000005           5         1           execve
+  0.15    0.000003           3         1           brk
+  0.15    0.000003           3         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.002028                  4988         1 total
+		    
+strace -c ./tr2u 'a' 'b' < test.txt     
+Output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.59    6.181915           1   5000000           write
+ 44.40    4.937551           1   5000002           read
+  0.00    0.000037           5         7           mmap
+  0.00    0.000035           9         4           mprotect
+  0.00    0.000019          10         2           open
+  0.00    0.000009           9         1           munmap
+  0.00    0.000007           4         2           close
+  0.00    0.000007           4         2           fstat
+  0.00    0.000006           6         1         1 access
+  0.00    0.000006           6         1           execve
+  0.00    0.000004           4         1           brk
+  0.00    0.000004           4         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00   11.119600              10000024         1 total
+
+Analysis: Although the overall number of system calls increased
+	  in tr2b, it still remains that the number of syscalls in
+	  tr2b(182) is much lower than in tr2u(10000024).
+
+4. Timing the programs
+Commands: 
+time ./tr2b 'a' 'b' < test.txt > o.txt
+Output:
+real    0m0.216s
+user    0m0.138s
+sys     0m0.005s
+
+time ./tr2u 'a' 'b' < test.txt > o.txt
+Output:
+real    0m5.811s
+user    0m0.249s
+sys     0m5.504s
+
+Analysis: As we can see the buffered program ran almost 26 times
+faster. And notice how the unbuffered program spends the majority
+of its run time in the system space; thus, verifying what we
+were taught in class.

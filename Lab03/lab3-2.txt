@@ -1,0 +1,108 @@
+We start off by downloading the Coreutils 7.6 package using the command:
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+Then, we extract the .gz file into a directory named coreutils-7.6 
+using the command:
+tar -xzvf coreutils-7.6.tar.gz
+
+At the same time we create a new directory: 
+mkdir coreutilsInstall
+
+We navigate into the newly extracted coreutilis-7.6 directory and read the
+INSTALL file ( vi INSTALL).
+Using "/prefix" we quickly move to the portion of the file
+that has extensive insturctios on how to use the prefix option for configure.
+
+We check the absolute path to the coreutils-7.6 directory using the "pwd"
+command. 
+The command returns the absolute path "/u/ee/ugrad/juno/coreutils-7.6". We
+modify it so that the makefiles are installed to the
+coreutilsInstall directory. We proceed to run the following commands: 
+
+./configure --prefix=/u/ee/ugrad/juno/coreutilsInstall
+make
+makeInstall
+
+we now navigate to coreutilsInstall/bin. To reproduce the problem stated,
+we execute ./ls -l. All the files listed have the undesirbale date format
+YYYY/MM/DD.
+
+Fixing the rpoblem with a patch: 
+we navigate to corneutils-7.6 and copy 
+Brady's patch file and paste it into a file named "patch_file". 
+we check the function of patch -pnum < patch_file using the man pages. 
+
+OUTPUT AFTER RUNNING patch -pnum < patch_file
+make  all-recursive
+make[1]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+Making all in lib
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make  all-recursive
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[4]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[4]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+Making all in src
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+make  all-am
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+  CC     ls.o
+  CCLD   dir
+  CCLD   vdir
+  CCLD   ls
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+Making all in doc
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/doc'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/doc'
+Making all in man
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/man'
+  GEN    dir.1
+  GEN    vdir.1
+  GEN    ls.1
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/man'
+Making all in po
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/po'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/po'
+Making all in tests
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/tests'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/tests'
+Making all in gnulib-tests
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make  all-recursive
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make[4]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+make[2]: Nothing to be done for `all-am'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+make[1]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+
+To test whether the patch was successful, in coreutils-7.6, we create two files and execute the ./ls -l command
+touch -t 010101.38 old
+touch new
+./ls -l
+All the files are in the correct format. 
+
+
+We then navigate to coreutilsInstall/bin and execute the following commands:
+touch -t 010101.38 old
+touch new
+./ls -l > list.txt
+Since the bin directory has a very extensive list of files, we redirect the output
+to a file "list.txt". From the output,we see that all the files are still in the undesirable format.
+
+Q1. If we examine /src/ls.c, we see that case_long_iso_time_style: is actually a label that the program
+can jump to when needed. Once the label is removed, the line "long_time_format[0] = long_time_format[1] = "%Y-%m-%d %H:%M""
+would never be executed. 
+
+Q2. The patch removes the assignment of the users locale into the date format, hence, it might cause
+problems to countries that have their own comvention when it comes to date formats as their locale have
+no effect on the date format. 

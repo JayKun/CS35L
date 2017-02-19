@@ -1,0 +1,167 @@
+1. Download coreutils zip file with bug
+using the command 
+wget http://web.cs.ucla.edu/classes/winter17/cs35L/
+assign/coreutils-with-bug.tar.gz
+
+2. Unzip the file
+tar -xzvf coreutils-with-bug-tar.gz
+
+3. We navigate to the coreutils-with-bug directory
+   cd coreutils-with-bug
+
+4. Build old version of coreutils
+   commands: 
+   ./configure
+   make 
+
+Output:
+In file included from utimecmp.c:41:0:
+utimens.h:2:5: error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+     ^
+In file included from utimecmp.h:25:0,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was here
+ extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^
+make[3]: *** [utimecmp.o] Error 1
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/CS35L/Lab04/coreutils-with-bug/lib'
+make[2]: *** [all] Error 2
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/CS35L/Lab04/coreutils-with-bug/lib'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/w/home.10/ee/ugrad/juno/CS35L/Lab04/coreutils-with-bug'
+make: *** [all] Error 2
+
+Observation:
+The error seem to originate from the conflicting return type declared
+for the function 'futimens' in utimecmp.h and utimecmp.c. 
+
+5.Download the patch
+  command:
+  wget http://web.cs.ucla.edu/classes/winter17/cs35L/assign/coreutils.diff
+  
+6.Patch the affected files
+  command:
+  patch -p0 < coreutils.diff
+  Output:
+  patching file lib/utimens.c
+  patching file lib/utimens.h
+  patching file src/copy.c
+  patching file src/tee.c
+  patching file src/touch.c
+  
+7.We run 'make' again
+  The compilation was successful without any errors. 
+
+8.We reproduce the problem stated
+  $ tmp=$(mktemp -d)
+  $ cd $tmp  
+  $ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+  $ touch now
+  $ sleep 1
+  $ touch now1
+  $ TZ=UTC0 ~/CS35L/Lab04/coreutils-with-bug/src/ls -lt ls -lt --full-time wwi-armistice now now1
+  
+  Output:
+  -rw-r--r-- 1 juno eeugrad 0 1918-11-11 03:00:00.000000000 -0800 wwi-armistice
+  -rw-r--r-- 1 juno eeugrad 0 2017-02-03 22:33:44.161638819 -0800 now1
+  -rw-r--r-- 1 juno eeugrad 0 2017-02-03 22:33:35.738413438 -0800 now
+  
+  Analysis:
+  Supposedly, the three files should be listed from newest to oldest.
+  However in the output, the 'wwi-armistic' file is listed first, which is not
+  supposed to happen. 
+
+9. In order to effectively run the debugger on ls we navigate to the program 
+   directory. 
+   command:
+   cd src
+   and examine the ls.c file using the vim utility.
+   However, due to the thousand lines of code, I didn't know what to look for.
+   
+10.We try a different approach which is by using gdb to
+   walk through the ls  program. 
+   
+   comamnds:
+   gdb ls
+   (gdb) break main
+   (gdb) info function    
+
+   Analysis:
+   We need to find how the function that determines the position of the files 
+   on the list based on time. We guess that there exist one function that
+   does all the comparing work. 
+   
+   using "info function" in gdb, we came up with a few candidates.
+   
+   static int compare_atime(V, V);
+   static int compare_ctime(V, V);
+   static int compare_mtime(V, V);
+       
+   Thus, we set break points at each of them and see which function is called
+   when the command "ls -lt" is invoked. 
+   
+   After some trial and error, we discovered that only the compre_mtime
+   function was called. Hence, we postulate that this where the bug is.
+   
+   This time we remove all existing breakpoints and set a breakpoint at
+   compare_mtime.Then, we step through the function line by line to 
+   figure out what went wrong.  
+   
+   commands:
+   (gdb)delete
+   (gdb)b compare_mtime
+   (gdb)run -lt
+   (gdb)list compare_mtime
+ Output: 
+/* Return negative, zero, positive if A < B, A == B, A > B, respectively.
+44      Assume the nanosecond components are in range, or close to it.  */
+45      static inline int
+46      timespec_cmp (struct timespec a, struct timespec b)
+47      {
+48        int diff = a.tv_sec - b.tv_sec;
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+50      }
+51
+52      # if ! HAVE_DECL_NANOSLEEP
+Analysis: On lines 48 and 49 there are possibilities for overflow.
+	  We need to locate which file the function is located in.
+We step through the function repeatedly using 's' and finally we arrive at
+the line 'timespec_cmp (b=..., a=...) at ../lib/timespec.h:48'. 
+Thus, telling us that the function is located in timespec.h:48
+
+11. We need to modify timespec_cmp which is called in compare_mtime.
+    emacs lib/timespech.h
+    Modifications are in the diff file. 
+    Notice how there are comments before the function 
+    that provide us hints. 
+    The function should return 1,0, and -1 based on the description of
+    the function given in the comment. 
+    
+    We then use diff to produce a patch.
+
+12. Generate diff file
+    To avoid confusion I renamed the working copy of coreutils "coreutils"
+    diff -u coreutils-with-bug/lib/timespec.h coreutils/lib/timespec.h>lab4.diff
+
+13. Generate change log
+    Knowing little about change log, I googled it.
+    emacs 
+    C-x 4 a
+
+14. Copy the "ChangeLog" file produced as a header to lab4.diff
+
+15. Reproduce the problem in the home directory
+    cd ~
+    touch -d '1918-11-11 11:00 GMT' wwi-armistice 
+    touch now
+    sleep 1
+    touch now1
+    TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+
+    Output:
+-rw-r--r-- 1 juno eeugrad 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 juno eeugrad 0 2017-02-07 08:19:49.921173000 +0000 now1
+-rw-r--r-- 1 juno eeugrad 0 2017-02-07 08:19:09.106250000 +0000 now
+
+The system sees the 1918 dated file as 2054.

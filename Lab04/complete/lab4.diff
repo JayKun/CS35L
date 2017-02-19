@@ -1,0 +1,25 @@
+2017-02-07  Jun Kai Ong  <juno@lnxsrv07.seas.ucla.edu>
+
+        * coreutils/lib/timespec.h (timespec_cmp)
+        There is an overflow problem associated with the subtraction of both the
+        times a and b. Hence, we modify the function such that it comapares the
+        times and returns positive, negative or zero.
+
+--- coreutils-with-bug/lib/timespec.h	2005-09-21 23:05:39.000000000 -0700
++++ coreutils/lib/timespec.h	2017-02-06 23:53:35.109539000 -0800
+@@ -45,8 +45,13 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  
++ if(a.tv_sec>b.tv_sec)
++    return 1;
++ else if (b.tv_sec>a.tv_sec)
++    return -1;
++ else
++    return a.tv_nsec - b.tv_nsec;
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP
