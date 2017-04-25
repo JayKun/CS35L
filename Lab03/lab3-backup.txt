@@ -1,0 +1,148 @@
+We start off by downloading the Coreutils 7.6 package using the command:
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+Then, we extract the .gz file into a directory named coreutils-7.6 
+using the command:
+tar -xzvf coreutils-7.6.tar.gz
+
+At the same time we create a new directory: 
+mkdir coreutilsInstall
+
+We navigate into the newly extracted coreutilis-7.6 directory and read the
+INSTALL file ( vi INSTALL).
+Using "/prefix" we quickly move to the portion of the file
+that has extensive insturctios on how to use the prefix option for configure.
+
+We check the absolute path to the coreutils-7.6 directory using the "pwd"
+command. 
+The command returns the absolute path "/u/ee/ugrad/juno/coreutils-7.6". We
+modify it so that the makefiles are installed to the
+coreutilsInstall directory. We proceed to run the following commands: 
+
+./configure --prefix=/u/ee/ugrad/juno/coreutilsInstall
+make
+makeInstall
+
+we now navigate to coreutilsInstall/bin. To reproduce the problem stated,
+we execute ./ls -l. All the files listed have the undesirbale date format
+YYYY/MM/DD.
+
+-rwxr-xr-x 1 juno eeugrad  82510 2017-01-27 04:37 nice
+-rwxr-xr-x 1 juno eeugrad 370377 2017-01-27 04:37 nl
+-rwxr-xr-x 1 juno eeugrad  84619 2017-01-27 04:37 nohup
+-rwxr-xr-x 1 juno eeugrad 216992 2017-01-27 04:37 od
+
+
+Fixing the problem with a patch: 
+we navigate to corneutils-7.6 and copy 
+Brady's patch file and paste it into a file named "patch_file". 
+we check the function of patch -pnum < patch_file using the man pages. 
+
+patch -pnum < patch_file
+OUTPUT AFTER RUNNING patch -pnum < patch_file:
+make  all-recursive
+make[1]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+Making all in lib
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make  all-recursive
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[4]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[4]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+Making all in src
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+make  all-am
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+  CC     ls.o
+  CCLD   dir
+  CCLD   vdir
+  CCLD   ls
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+Making all in doc
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/doc'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/doc'
+Making all in man
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/man'
+  GEN    dir.1
+  GEN    vdir.1
+  GEN    ls.1
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/man'
+Making all in po
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/po'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/po'
+Making all in tests
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/tests'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/tests'
+Making all in gnulib-tests
+make[2]:Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make  all-recursive
+make[3]:Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make[4]:Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make[4]:Nothing to be done for `all-am'.
+make[4]:Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[3]:Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[2]:Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[2]:Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+make[2]:Nothing to be done for `all-am'.
+make[2]:Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+make[1]:Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+
+To test whether the patch was successful, in coreutils-7.6/src,
+we create two files old and new and execute the "./ls -l" command
+
+cd coreutils-7.6/src
+touch -t 0101011220 old
+touch new
+./ls -l -> list.txt
+All the files are in the correct format as you can see
+from this small fregment of list.txt. 
+
+-rw-r--r-- 1 juno eeugrad      0 Jan 29 18:02 new
+-rwxr-xr-x 1 juno eeugrad  82510 Jan 27 04:36 nice
+-rw-r--r-- 1 juno eeugrad   5442 Sep  1  2009 nice.c
+-rw-r--r-- 1 juno eeugrad  17368 Jan 27 04:36 nice.o
+-rwxr-xr-x 1 juno eeugrad 370377 Jan 27 04:36 nl
+-rw-r--r-- 1 juno eeugrad  16764 Sep  1  2009 nl.c
+-rw-r--r-- 1 juno eeugrad  39976 Jan 27 04:36 nl.o
+-rwxr-xr-x 1 juno eeugrad  84619 Jan 27 04:36 nohup
+-rw-r--r-- 1 juno eeugrad   6938 Sep  1  2009 nohup.c
+-rw-r--r-- 1 juno eeugrad  20600 Jan 27 04:36 nohup.o
+-rwxr-xr-x 1 juno eeugrad 216992 Jan 27 04:36 od
+-rw-r--r-- 1 juno eeugrad  56684 Sep  1  2009 od.c
+-rw-r--r-- 1 juno eeugrad 114600 Jan 27 04:36 od.o
+-rw-r--r-- 1 juno eeugrad      0 Jan  1  2001 old
+
+Interstingly, files that are older than 1 year old
+display dates in the MM DD YYYY format, 
+but files that are younger than 1 year,
+displays dates in teh MM DD TT:TT format.
+A practical reason for this might be that files
+modified within a year are more likely
+to be access again and hence it would make sense to display the time
+instead of the year.
+The time inforamtion at the end allows users to
+differentiate between files modified on the same day. 
+
+We then navigate to coreutilsInstall/bin and execute the following commands:
+touch -t 0101011220 old
+touch new
+./ls -l > list.txt
+Since the bin directory has a very extensive list of files,
+we redirect the output to a file "list.txt". From the output, 
+we see that all the files are still in the undesirable format.
+Note the "new" and "old" file produced in the small fragment of list.txt
+-rw-r--r-- 1 juno eeugrad      0 2017-01-27 05:22 new
+-rwxr-xr-x 1 juno eeugrad  82510 2017-01-27 04:37 nice
+-rwxr-xr-x 1 juno eeugrad 370377 2017-01-27 04:37 nl
+-rwxr-xr-x 1 juno eeugrad  84619 2017-01-27 04:37 nohup
+-rwxr-xr-x 1 juno eeugrad 216992 2017-01-27 04:37 od
+-rw-r--r-- 1 juno eeugrad      0 2001-01-01 12:20 old
+
+
+
+

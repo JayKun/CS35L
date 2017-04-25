@@ -32,17 +32,18 @@ done
 #Combine ARRAY and FIRSTARRAY
 ARRAY=("${FIRSTARRAY[@]}" "${ARRAY[@]}")
 let count=count+firstcount
+echo $count
 
 for (( i=0;i<$count;i++ ))
 do
     for (( j=$i+1;j<$count;j++ ))
     do
-	file1="${ARRAY[i]}"
-	file2="${ARRAY[j]}"
-      	cmp -s -- "$file1"  "$file2"
-	if [ $? -eq 0 ]
+	file1="ls -i ${ARRAY[i]}"
+	file2="ls -i ${ARRAY[j]}"
+	compare=`cmp -s $file1 $file2`
+	if [ ! compare ]
 	    then
-	    ln -f -- "$file1" "$file2"
+	    ln -f "${ARRAY[$i]}" "${ARRAY[$j]}"
 	fi
     done
 done

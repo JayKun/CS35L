@@ -1,0 +1,80 @@
+We start off by downloading the Coreutils 7.6 package using the command:
+wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+
+Then, we extract the .gz file into a temporary directory named coreutilsInstall
+in the home directory using the commands:
+tar -xzvf coreutils-7.6.tar.gz
+mkdir coreutilsInstall
+
+We navigate into teh coreutilis-7.6 directory we just extracted and read the
+INSTALL file. Using "/prefix" we can quickly move to the portion of the file
+that has extensive insturctios on how to use the prefix option for configure.
+
+We check the absolute path to the coreutils-7.6 directory using the "pwd"
+command but modify it so that the makefiles are installed to the
+coreutilsInstall directory. 
+./configure --prefix=/u/ee/ugrad/juno/coreutilsInstall
+make
+makeInstall
+
+we now navigate to coreutilsInstall/bin. To reproduce the probalme stated,
+we execute ./ls -l. All the files listed have the incoreect date format
+YYYY/MM/DD which was mentioned in the specs. 
+
+We now proceed to apply the patch to fix this:
+we navigate to corneutils-7.6. Copy Brady's patch file and paste it into a file
+named patch_file. 
+we proceed to check the function of patch -pnum < patch_file through
+the man pages. 
+make  all-recursive
+make[1]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+Making all in lib
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make  all-recursive
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[4]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[4]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/lib'
+Making all in src
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+make  all-am
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+  CC     ls.o
+  CCLD   dir
+  CCLD   vdir
+  CCLD   ls
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/src'
+Making all in doc
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/doc'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/doc'
+Making all in man
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/man'
+  GEN    dir.1
+  GEN    vdir.1
+  GEN    ls.1
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/man'
+Making all in po
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/po'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/po'
+Making all in tests
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/tests'
+make[2]: Nothing to be done for `all'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/tests'
+Making all in gnulib-tests
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make  all-recursive
+make[3]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make[4]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests                                                                                                             '
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[3]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6/gnulib-tests'
+make[2]: Entering directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+make[2]: Nothing to be done for `all-am'.
+make[2]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+make[1]: Leaving directory `/w/home.10/ee/ugrad/juno/coreutils-7.6'
+ 

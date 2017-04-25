@@ -1,0 +1,94 @@
+import string, locale, sys
+from optparse import OptionParser
+
+class comm:
+    def __init__(self, filename1, filename2):
+        if filename1="-":
+            self.lines1 = sys.stdin.readlines()
+        else:
+            #Direct inputs to comm
+            f1 = open(filename1, 'r')
+            self.lines1 = f1.readlines()
+            f1.close()
+            
+        if filename2="-":
+            self.lines2 = sys.stdin.readlines()
+            
+        else:
+            f2 = open(filename2, 'r')
+            self.lines2 = f2.readlines()
+            f2.close()
+        list1=[]
+        list2=[]
+        list3=[]
+
+    def compare(self):
+        for line1 in lines1:
+            line1=line1.strip()
+        for line2 in lines2:
+            lines2=line2.strip()
+        list1=line1-line2
+        list2=line2-line1
+
+        
+        for line1 in self.lines1:
+            if line1 in self.line2:
+                list3.append(line1)                
+    def printList(self):
+        if 
+
+def main():
+    locale.setlocale(locale.LC_ALL, 'C')
+    version_msg = "%prog 1.0"
+    usage_msg = """%prog [OPTION]... FILE1 FILE2
+
+select or reject lines common to FILE1 FILE2."""
+
+    parser = OptionParser(version=version_msg,
+                          usage=usage_msg)
+    parser.add_option("-1",
+                      action="store_false", dest="suppress1", default=True,
+                      help="suppress lines unique to file1 (default false)")
+
+    parser.add_option("-2",
+                      action="store_false", dest="suppress2", default=True,
+                      help="suppress lines unique to file2 (default false)")
+    
+    parser.add_option("-3",
+                      action="store_false", dest="suppress1", default=True,
+                      help="suppress lines common to both files (default false)")
+    
+    parser.add_option("-u",
+                      action="store_false", dest="unsort", default=True,
+                      help="compares unsorted file")
+    
+    
+    options, args = parser.parse_args(sys.argv[1:])
+
+    try:
+        sup1 = bool(options.suppress1)
+        sup2 = bool(options.suppress2)
+        sup3 = bool(options.suppress3)
+        usort = bool(options.unsort)
+    except:
+        parser.error("invalid SUPPRESS: {0}".
+                     format(options.suppress))
+    if :
+        parser.error("negative count: {0}".
+                     format(numlines))
+    if len(args) != 2:
+        parser.error("wrong number of operands")
+    input_file = args[0]
+
+    try:
+        generator = comm(args[0], args[1])
+        for item in range(numlines):
+            sys.stdout.write(generator.chooseline())
+    except IOError as (errno, strerror):
+        parser.error("I/O error({0}): {1}".
+                     format(errno, strerror))
+
+        
+
+if __name__ == "__main__":
+    main()

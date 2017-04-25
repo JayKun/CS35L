@@ -1,0 +1,44 @@
+Q1.
+If we examine /src/ls.c, we see that case_long_iso_time_style:
+is actually a label that the program
+can jump to when needed. Notice that there are two such labels.
+Brady merely removes one of the labels
+to clean up code. The following lines of code would
+still be executed with or without removing the extra label. 
+
+Q2.
+The patch removes the assignment of the users locale into the date format,
+hence, it might cause
+problems to countries that have their own comvention 
+when it comes to date formats as their locale have
+no effect on the date format. 
+
+Q3.
+The randline.py program outputs the following: 
+"
+File "randline.py", line 47, in <module>
+    main()
+File "randline.py", line 41, in main
+    sys.stdout.write(generator.chooseline())
+File "randline.py", line 11, in chooseline
+    return random.choice(self.lines)
+File "/usr/lib64/python2.6/random.py", line 261, in choice
+    return seq[int(self.random() * len(seq))] 
+	# raises IndexError if seq is empty
+IndexError: list index out of range
+"
+Note that the error was raised in the file random.py instead of randline.py.
+Since the random function needs to return a sequence of random numbers.
+The sequence would be empty and thus, is an undefined behavior. 
+
+Q4
+File "randline.py", line 42
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+
+In Python3, errors are not passed as tuples,
+instead there are passs as a single "er" object. 
+If we intend to access errno and strerror,
+we would need to do er.errorno and er.stderror
+respectively. 

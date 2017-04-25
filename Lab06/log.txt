@@ -1,0 +1,61 @@
+1. We measure the performance of multithreading sort by running on a 10M file
+   consisting of a single-precision floating point numbers, one per line
+   with no white space. 
+
+2. We first add /usr/local/cs/bin to $PATH so that we can invoke mutithreading
+   sort from the command line by running the command:
+   export PATH=/usr/local/cs/bin:$PATH
+3. We then check to make sure that the current sort version that we are using
+   is indeed the latest version.
+   command: sort --version
+   output: sort (GNU coreutils) 8.24
+
+4. Next, generate  a 40MB file with random single precision floating point
+   numbers. Since each floating point is 4 bytes in size. 
+   We use the od utility to read 40000000 bytes from urandom.
+   We then pipe the output to tr where empty spaces will be replaced
+   with newlines. Followed by sed where the blank lines are removed.
+   command: od -tf -An -N 40000000 < /dev/urandom | tr -s [:blank:] '\n'
+	    | sed '/^$/' > out.txt
+
+5. With the data, we proceed to time the sort command with our data as input.
+   command: time -p sort -g out.txt
+   output: real 16.33
+   	   user 89.90
+	   sys 0.19
+6. Next, we attempt to use multithreading to speed up the sorting process.
+   1 thread:
+   command:
+   time -p sort -g --parallel=1 out.txt > /dev/null
+   output:
+   real 84.36
+   user 84.23
+   sys 0.13
+
+   2 thread:
+   command:
+   time -p sort -g --parallel=2 out.txt > /dev/null
+   output:
+   real 44.73
+   user 85.21	
+   sys 0.13
+
+   4 thread:
+   command:
+   time -p sort -g --parallel=4 out.txt > /dev/null
+   output:
+   real 25.81
+   user 88.08
+   sys 0.15 
+
+   8 thread:
+   command:
+   time -p sort -g --parallel=8 out.txt > /dev/null
+   output:
+   real 16.40
+   user 91.24
+   sys 0.19
+
+7. Interestingly, despite speeding up the real time execution, the user time
+   execution stays almost the same regardless of how many threads are used. 
+   The sys time execution also remains the same.

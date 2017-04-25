@@ -1,0 +1,22 @@
+Upper left subwindow:
+      Shows the series of commits to this repository in chronological order.
+      It also shows a hierarchical tree of commits along with branches.
+      Information displayed:
+      		  commit messages
+		  remote branches
+		  commit SHA
+		  and current commit
+
+Upper Middle subwindow:
+      Shows the name and emails of the authors or contributors to the repo.
+      Each row of authors correspond to the commits they made on the left
+      subwindow.
+
+Upper Right subwindow:
+      Shows the corresponding commits dates of each role of commits.
+
+Lower Left subwindow:
+      Shows the corresponding changes done by a commit in diff format.
+      
+Lower Right subwindow:
+      Shows files impacted by the selected commit. 

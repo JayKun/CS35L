@@ -1,0 +1,152 @@
+We first check whether the environment variables are set to the correct values.
+using the command "locale". The output did not match the output descirbed in the
+assignment specs. Thus, we run the command, "export LC_ALL = 'C'".  The locale
+command now shows all the environment variables being set to 'C'.
+
+We create a sorted list of English words by sorting the file
+/usr/share/dict/words from the SEASnet server and outputting the sorted list to
+a file named words in the working directory using the command: "sort
+/usr/share/dict/words > words"
+
+We now extract the HTML file from the assignment webpage using the command:
+"wget http://web.cs.ucla.edu/classes/winter17/cs35L/assign.html" The command
+returns a file named assign2.html.
+
+Moving on to the commands listed in the specs.  I will refer to each explanation
+of the 6 commands as a-f respectively:
+
+(a)tr -c 'A-Za-z' '[\n*]' We need to process the input file, assign2.txt and
+output the results to a separate file named assign2-a.txt for further
+examination.Thus, we run the command : tr -c 'A-Za-z' '[\n*] < assign2.txt >
+ex1.txt' .  Characters and strings in ex.txt are separated by different number
+of newlines but no non letter characters are seen. Upon close comparison with
+the original file, we can conclude that this command converts each non letter
+character into a newline.  The tr command with the -c option takes the
+complement of the string 'A-Za-z'(all upper and lower case letters) which are
+all the non letter charcaters and converts them into newlines.
+
+(b)tr -cs 'A-Za-z' '[\n*]' < assign2.html > ex2.txt By examining the file
+outputted, we see a single newline at the start of the document followed by a
+string of letter characters. Each string is on it's own line. Referring back to
+(a), we know that the non letter characters are replaced with newline
+characters. However, in this case, multiple newlines are squeeze into just one
+newline at most one character that separates each string.
+
+(c)tr -cs 'A-Za-z' '[\n*]' | sort < assign2.html > ex3.txt Each string is still
+on their own line like in (b) and each string is separated with at most one
+newline character. However, since we piped the result to sort, the string of
+characters are each arranged in ASCII order from top to bottom.
+
+(d)tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u > ex4.txt For this command,
+the results are the same as (c) but the duplicate words are removed. We can thus
+conclude that the -u option removes duplicates and only returns and sorts unique
+words.
+
+(e)tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm - words > ex5.txt The
+list of words returned has 3 columns, each column separated by a '\t' character.
+Upon examination, the words in column 1 are unique to only assign2.txt while
+column 2 has a very entensive list of words unique to only the words file.  The
+third column are list of words that appear in both the assign2.txt and the words
+file. Hence, we can conclude that the additional comm command compares the list
+of words in the file words to assign2.html and categorizes each word based on
+their occurences.
+  
+(f)tr -cs 'A-Za-z' '[\n*]'< assign2.html | sort -u | comm -23 words > ex6.txt
+The output is now shorter. The list of words that appear in the file are all
+words found uniquely in assign2.html The -23 option supresses the 2nd and 3rd
+column of the output in (e) In other words, the above command returns all the
+words uniquely in assign2.html.
+
+In order to make the dictionary, we first need to obtain the obtain the html
+file using the command : wget http://mauimapp.com/moolelo/hwnwdseng.htm
+
+Once obtained we run the command: cat hwnwdseng.htm | ./buildwords > hwords The
+file hwords would contain a list of Hawaiian words extracted from the webpage
+
+Design of buildwords
+
+grep "<td>.*</td>" | \
+This line extracts each line of code that is an element on the table.
+
+sed -e "s@<td>\(.*\)</td>@\1@g" | \
+This removes the <td> tags from each element on the table.
+We are now left with the content of the table elements which are the
+English and Hawaiian without the <td> tags.
+
+sed 's/^\s*//g ' | \
+Removes the leading spaces on each line.
+
+sed '/^$/d' | \
+Removes any empty lines. 
+
+sed -n '0~2p' | \
+We know that every second line refers to a Hawaiian word. Hence, the command 
+
+tr '`' "'" | \
+Replaces all " ` " with " ' "
+
+sed -e "s@<u>\(.\)</u>@\1@g" | \
+Removes <u> tags and returns content in tags. 
+
+tr "[:upper:]" "[:lower:]" | \
+Convert all uppercase characters to lowercase characters.
+
+sed "s/,\s\|\s/\n/g"  | \
+Since we treat words separated by spaces and commas as one word. 
+We replace them with '\n' so that the word moves to a new line
+and will thus be regarded as an individual word.
+
+sort -u
+sort the list based on locale and remove any duplicates
+
+We then run the command chmod +x buildwords so that the file has
+execute permission.
+
+We would try to output files named missHawaiian and missEnglish that contain all
+the misspelled Hawaiian words and English words respectively. 
+
+To obtain missHawaiian: we first make all characters lowercase using the command
+tr '[:upper:]' '[:lower:]' < assign2.html > hawaii.html then we eliminate all
+non Hawaiian characters and replace them with newlines tr -cs "pk\'mnwlhaeiou"
+['\n*'] < hawaii.html | sort -u | comm -23 - hwords > missHawaiian
+
+Finally, to count how many misspelled words are there, we run 
+wc -w missHawaiian
+which gives us 197
+
+To obtain missEnglish:
+we first make all characters lowercase using the command
+tr '[:upper:]' '[:lower:]' < assign2.html > english.html
+then we eliminate all non English characters and replace them with newlines
+tr -cs "pk\'mnwlhaeiou" ['\n*'] < english.html | sort -u | comm -23 - hwords > missEnglish
+
+Finally, to count how many misspelled English words there are, we run
+wc -w missEnglish
+which gives us 38
+
+Now, to obtain any words "misspelled" as English, but not as Hawaiian:
+cat missEnglish | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -12 - hwords > missEnglishButHawaii
+Examples:
+e
+halau
+i
+lau
+po
+wiki
+
+Next, to obtain any words "misspelled" as Hawaiian, but not as English:
+cat missHawaii | tr -cs "[a-zA-Z]" '[\n*]' | sort -u | comm -12 - words > missHawaiiButEnglish
+A few Examples are:
+a
+ail
+ain
+ake
+hawaiian
+hell
+how
+keep
+love
+men
+people
+paul
+who

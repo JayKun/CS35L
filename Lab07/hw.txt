@@ -1,0 +1,28 @@
+1) If would be secure. The only information the other teams can obtain are the public key of the receiver
+and encrypted messages. Since the private key that can decrypt the message is not derivable from
+the public key, the message is secure and not publicly known. Once server validation is done,
+client and server will agree on a symmetric encryption key also known as a session key. All messages
+sent between the client and server are encrypted and decrypted with this session key. This key
+is only known to the client and the server; hence, the other teams observing on the encrypted
+messages will not be able to decrypt it.
+
+For (1), it would still be secure if my team's keystrokes are known and recorded.
+The keystokes compromise the passphrase used for authentication but my private key which
+is located in the .ssh/ directory is still secured. 
+
+For (2), it is likely my network is not secured. The attackers will have access to the private 
+and sesion keys located in .ssh directory set up in the servers. Hence, it would be possible
+for them to decrypt all messages going across the network the next time they observe my
+network. 
+
+2) According to the manual pages, with no arguments, the signature packet (.asp) is read
+from stdin and verifies that the decrypted signature and the hashed data are the same. 
+The server has no way of verifying what the true sender's public
+key is. Hence, an attacker could intercept the signature packet, modify the public key
+inside to be the attacker's, change the data and produce a detached signature file. 
+A new tar file can then be created and sent to the server. 
+Since the data and the signature has been modified, gpg --vefify fails to verify
+that I the tar file was created by me. 
+A way around this would be to keep track of valid/secure public keys by ther server.
+If a tar file is created by a client that has a public key that does not belong to the list, 
+the validation will automatically fail.  

@@ -1,0 +1,119 @@
+1. We create a homework lab notebook. 
+   Command:
+   emacs hw9.txt
+
+2. We checkout version 3.0 of Diffutils into a new
+   branch "quote"
+   
+   Command:
+   git checkout -b 'quote' 'v3.0'
+
+   Output:
+   Switched to a new branch 'quote'
+   
+3. We use the patch we just created on the directory
+   
+   Commands:
+   patch -p1 < ../complete/quote-3.0-patch.txt
+
+   Output:
+   patching file src/cmp.c
+   patching file src/diff.c
+   patching file src/diff3.c
+   patching file src/dir.c
+   patching file src/sdiff.c
+   patching file src/util.c
+
+5. We use emacs add-change-log-entry-other-window function to
+   create a log file for the patch.
+
+   Commands:
+   emacs
+   C-x 4-a
+   // Type the appropriate logs
+   
+6. We commit our changes using our ChangeLog entry as a commit message
+   
+   Commands:
+   git add .
+   git commit -F ChangeLog
+
+   Output:
+   6 files changed, 43 insertions(+), 43 deletions(-)
+
+7. We proceed with the generation of a patch
+   
+   Commands:
+   git format-patch -1 --stdout > formatted-patch.txt
+   
+8. My partner for this assignment is Jayden Hiu Man Yeung.
+   First I create a branch "partnr" and checkout at 'v3.0'
+   I apply the patch and repeat the verification steps from the lab part of
+   the assignment.
+
+   Commands:
+   git checkout -b 'partner' v3.0
+   git am formatted-patch-jayden.txt
+   
+
+   Outputs:
+   Switched to a new branch 'partner'
+   Applying: 2017-03-13 Hiu Man Yeung <hiu@lnxsrv02.seas.ucla.edu>
+
+   Commands for testing:
+   ./bootsrap
+   ./configure
+   make
+   make check
+  
+   Tests:
+   ./src/diff . -
+   ./src/diff --help
+
+   Results:
+   The modified patch passed make check.
+   The program passed the test as there are no grave accent printed.
+   
+  
+9. We now verify that the ChangeLog works by running make distdir based on
+   the specs. 
+   
+    make distdir
+
+    A new directory named "diffutils-3.0.1-487ca" is created. We cd into this
+    directory and read the ChangeLog file. 
+    
+    First change in ChangeLog file:
+    2017-03-15  Jun Kai Ong  <juno@lnxsrv03.seas.ucla.edu>
+
+        2017-03-15  Jun Kai Ong  <juno@lnxsrv03.seas.ucla.edu>
+                * cmp.c: Changed appropriate grave accent (U+0060) to apostrophe (U+0027)
+                * diff.c: Changed appropriate grave accent (U+0060) to apostrophe (U+0027)
+                * diff3.c: Changed appropriate grave accent (U+0060) to apostrophe (U+0027)
+                * dir.c: Changed appropriate grave accent (U+0060) to apostrophe (U+0027)
+                * sdiff.c: Changed appropriate grave accent (U+0060) to apostrophe (U+0027)
+                * util.c: Changed appropriate grave accent (U+0060) to apostrophe (U+0027)
+ 
+    Hence, we can now verify that our log file works. 
+
+10. We learn to use gitk on the emacs repo. Since gitk has a GUI, we need to
+    use remote desktop connection. We first download the master branch from the
+    Savannah repo. In order to run gitk, we need X11 server forwarding. Since
+    I was using PuTTY all along, hence in order to run gitk, I needed to use
+    MobaXterm.
+
+   Commands:
+   git clone https://git.savannah.gnu.org/git/emacs.git
+   cd emacs
+   /usr/local/cs/bin/gitk
+   
+   Observations:
+   The gitk window pops out.
+   Going through the dates, the newest merge not newer than 2015-01-25 is
+   the merge committed on 2015-01-24 19:00:41.
+   
+   From the screenshot. we can see changes are done on indent/shell.sh.
+   In particular from the log file, it says 
+   "Use '[$# -eq 0]', not '[$# == 0]'".
+   This is more portable in shell scripts.
+   Fixes: bug#19658

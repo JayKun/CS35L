@@ -1,0 +1,225 @@
+import string, locale, sys
+from optparse import OptionParser
+
+class comm:
+    def __init__(self, filename1, filename2):
+        #check for piping 
+        if filename1=="-":
+            self.lines1 = sys.stdin.readlines()
+        else:
+        #Direct inputs to comm
+            f1 = open(filename1, 'r')
+            self.lines1 = f1.readlines()
+            f1.close()
+         
+        #check for piping
+        if filename2=="-":
+            self.lines2 = sys.stdin.readlines()
+        
+        #Direct inputs to comm
+        else:
+            f2 = open(filename2, 'r')
+            self.lines2 = f2.readlines()
+            f2.close()
+            
+        self.list1=[]
+        self.list2=[]
+        self.finalList=[]
+
+        for line1 in self.lines1:
+            self.list1.append(line1)
+        for line2 in self.lines2:
+            self.list2.append(line2)
+
+    def ucompare(self, sup1, sup2, sup3):
+        for line1 in self.lines1:
+            if line1 not in self.list2:
+                if sup1:
+                    continue;
+                else:
+                    self.finalList.append(line1)
+                
+            else: #common element in file1
+                if(sup3):
+                    self.list2.remove(line1)
+                    continue;
+                elif sup1 and sup2:
+                    self.finalList.append(line1)
+                    self.list2.remove(line1)
+                elif (not sup1 and sup2) or (not sup2 and sup1):
+                    self.list2.remove(line1)
+                    self.finalList.append("\t{0}".format(line1))
+                else:
+                    self.finalList.append("\t\t{0}".format(line1))
+                    self.list2.remove(line1)
+                               
+        for line2 in self.lines2:
+            if line2 not in self.list1 and not sup2:
+                if sup1:
+                    self.finalList.append(line2)
+                else:
+                    self.finalList.append("\t{0}".format(line2))
+                
+
+    def scompare(self, sup1, sup2, sup3):
+        i=j=0
+        while i!=len(self.list1) and j!=len(self.list2):
+            if(self.list2[j]<self.list1[i]):
+        	    if self.list2[j] not in self.list1: #Add element to second column
+                        if sup1 and not sup2:
+                            self.finalList.append(self.list2[j])
+                            j+=1
+                        elif sup2:
+                            j+=1
+                        else:
+                            self.finalList.append("\t{0}".format(self.list2[j]))
+                            j+=1
+  
+        	    else:
+                        if(sup3):
+                            del self.list2[j]
+                        elif(sup1 and not sup2)or(not sup1 and sup2):
+                            self.finalList.append("\t{0}".format(self.list2[j]))
+                            del self.list2[j]
+                        elif(sup1 and sup2):
+                            self.finalList.append(self.list2[j])
+                            del self.list2[j]
+                        else:    
+                            self.finalList.append("\t\t{0}".format(self.list2[j]))
+                            del self.list2[j]
+            else:
+                    if self.list1[i] not in self.list2: #element is unique
+                        if(sup1):
+                            i+=1
+                        else:
+                            self.finalList.append(self.list1[i])
+                            i+=1
+
+                    else: #element is common, column 3 Determine how many tabs and whether to show
+                        if(sup3):
+                            self.list2.remove(self.list1[i])
+                            i+=1
+                        elif(sup1 and not sup2) or (not sup1 and sup2):
+                            self.finalList.append("\t{0}".format(self.list1[i]))
+                            self.list2.remove(self.list1[i])
+                            i+=1
+                        elif sup1 and sup2:
+                            self.finalList.append(self.list1[i])
+                            self.list2.remove(self.list1[i])
+                            i+=1
+                        else:
+                            self.finalList.append("\t\t{0}".format(self.list1[i]))
+                            self.list2.remove(self.list1[i])
+                            i+=1
+
+        while i!=len(self.list1):
+                if self.list1[i] not in self.list2:
+                    if(sup1):
+                        return
+                    self.finalList.append(self.list1[i])
+                    i+=1
+                else: #output to column 3
+                    return
+                                                     
+        while j!=len(self.list2):
+                if self.list2[j] not in self.list1:
+                    if sup2:
+                        return
+                    elif sup1:    
+                        self.finalList.append("{0}".format(self.list2[j]))
+                        j+=1
+                    else:
+                        self.finalList.append("\t{0}".format(self.list2[j]))
+                        j+=1
+                else:
+                    return
+                    
+    def isSorted(self):
+        issort=True
+        if self.list1 != sorted(self.list1): 
+            sys.stderr.write("FILE1 not sorted\n")
+            issort=False
+            exit()
+        if self.list2 != sorted(self.list2):
+            sys.stderr.write("FILE2 not sorted\n")
+            issort=False
+            exit()
+        return issort
+        
+#prints the list according to the options passed in.
+    def printList(self):
+        for i in self.finalList:
+            sys.stdout.write(i)
+                                                                  
+def main():
+    locale.setlocale(locale.LC_COLLATE, 'C')
+    version_msg = "%prog 1.0"
+    usage_msg = """%prog [OPTION]... FILE1 FILE2
+
+select or reject lines common to FILE1 FILE2."""
+
+    parser = OptionParser(version=version_msg,
+                          usage=usage_msg)
+    parser.add_option("-1",
+                      action="store_true", dest="suppress1", default=False,
+                      help="suppress lines unique to file1 (default false)")
+
+    parser.add_option("-2",
+                      action="store_true", dest="suppress2", default=False,
+                      help="suppress lines unique to file2 (default false)")
+    
+    parser.add_option("-3",
+                      action="store_true", dest="suppress3", default=False,
+                      help="suppress lines common to both files (default false)")
+    
+    parser.add_option("-u",
+                      action="store_true", dest="usort", default=False,
+                      help="compares unsorted files")
+    
+    
+    options, args = parser.parse_args(sys.argv[1:])
+
+    try:
+        sup1 = bool(options.suppress1)
+    except:
+        parser.error("invalid argument for -1:{0}".
+                    format(options.suppress1))
+    try:
+        sup2 = bool(options.suppress2)
+    except:
+        parser.error("invalid argument for -2:{0}".
+                    format(options.suppress2))
+                                 
+    try:
+        sup3 = bool(options.suppress3)
+    except:
+        parser.error("invalid argument for -3:{0}".
+                    format(options.suppress3))
+                                 
+    try:
+        usort = bool(options.usort)
+    except:
+        parse.error("invalid argument for -u:{0}".
+                    format(options.usort))
+                                 
+    if len(args) != 2:
+        parser.error("wrong number of operands")
+    
+    inputFile1 = args[0]
+    inputFile2 = args[1]
+
+    try:
+        generator = comm(inputFile1, inputFile2)
+        if usort:
+            generator.ucompare(sup1, sup2, sup3)
+        elif(generator.isSorted()):
+            generator.scompare(sup1, sup2, sup3)
+         
+    except IOError as err:
+        parser.error("I/O error({0}): {1}".
+                     format(err.errno, err.strerror))
+    if len( generator.finalList):
+        generator.printList()
+
+if __name__ == "__main__":
+    main()

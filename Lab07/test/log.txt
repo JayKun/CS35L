@@ -1,0 +1,149 @@
+The first session of role playing involves me as the server
+and my partner as the client. 
+Some difficulties were encountered when I was trying to install
+openssh-server. The openssh-client installed on the OS was
+outdated but I wasn't able to update it. 
+Since openssh-server has a dependency on openssh-client,
+there was an installation error. 
+
+Fortunately after tweaking around with the settings in
+Software & Updates, I manage to solve the problem. 
+Next I generate a public/private rsa key pair by using the
+following command:
+ssh -keygen
+
+Create an account for client on the server
+command:
+sudo useradd -d /home/dir -m jayden
+sudo passwd jayden
+
+Create .ssh directory for new user
+command:
+cd /home/dir
+sudo mkdir .ssh
+
+Change ownership and permission on .ssh directory
+command:
+sudo chown -R username .ssh
+sudo chmod 700 .ssh
+
+
+Output:
+Your identification has been saved in /home/ubuntu/.ssh/id_rsa.
+Your public key has been saved in /home/ubuntu/.ssh/id_rsa.pub.
+The key fingerprint is:
+3c:00:a7:da:66:1a:ea:a3:e7:da:d6:6d:fe:7a:a8:6a ubuntu@ubuntu
+The key's randomart image is:
++--[ RSA 2048]----+
+|    . .          |
+|     +           |
+|    . .          |
+|   o   o         |
+|  o +   S        |
+| . =     .       |
+|. .. . .         |
+|.oE . + .        |
+|+B=..+o+.        |
++-----------------+
+ 
+
+commands: 
+sudo chown -R jayden .ssh
+ubuntu@ubuntu:/home/dir$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 34:17:eb:bb:eb:45  
+          inet addr:10.97.85.142  Bcast:10.97.85.255  Mask:255.255.255.0
+          inet6 addr: fe80::3617:ebff:febb:eb45/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:38462 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:26615 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:44294317 (44.2 MB)  TX bytes:3277325 (3.2 MB)
+          Interrupt:20 Memory:fb200000-fb220000 
+
+Results:
+My partner was able to successfully log in to my server. However, he 
+was not able to use the ssh utility with the -X GUI option. It was mainly
+due to an old version of X11 session forwarding. 
+
+After searching online for a solution:
+The fix was simply: 
+"sudo apt-get install xorg openbox" to install/update xorg	              
+
+
+The next session of role play involves me as the client and my
+partner as the server/host. 
+
+As the client I first generate public and private key pair
+command:
+ssh-keygen
+
+Output:
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/ubuntu/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/ubuntu/.ssh/id_rsa.
+Your public key has been saved in /home/ubuntu/.ssh/id_rsa.pub.
+The key fingerprint is:
+c9:28:c2:80:2d:f8:f0:87:4c:60:4d:b5:ac:c9:b7:09 ubuntu@ubuntu
+The key's randomart image is:
++--[ RSA 2048]----+
+|..o...           |
+|+o .. .          |
+|* o  o           |
+| X..o  o .       |
+|  BEo.. S        |
+|   oo.o          |
+|     o           |
+|                 |
+|                 |
++-----------------+
+
+After knowing the username to my account set up on the host.
+I copy my public key to the server for key-based authentication
+command:
+ssh-copy-id -i jun@10.97.85.169
+
+Then I add private key to authentication (ssh-agent) to
+make authentication more convenient. 
+ssh -add
+
+Output:
+Enter passphrase for /home/ubuntu/.ssh/id_rsa: 
+Identity added: /home/ubuntu/.ssh/id_rsa (/home/ubuntu/.ssh/id_rsa)
+ubuntu@ubuntu:~$ Generating public/private rsa key pair.
+
+We then add SSH to server
+ssh jun@10.97.85.169
+Testing:
+command:
+ls
+output:
+examples.desktop
+command: 
+mkdir test
+ls
+output:
+examples.desktop test
+
+After verifying the creation of the directory of my partner's computer
+I proceed to try out the -X option for ssh
+command:
+ssh -X jun@10.97.85.169
+output:
+Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-31-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+Last login: Wed Mar  1 11:14:58 2017 from 10.97.85.169
+
+command: firefox
+Observation:
+A firefox window pops out
+
+command: xterm
+Observation:
+A xterm window pops out

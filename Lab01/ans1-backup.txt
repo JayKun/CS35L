@@ -1,0 +1,126 @@
+﻿Name: Jun Kai Ong
+Class: CS 35L Winter 2017
+Professor: Prof Paul Eggert
+Teaching Assistant: Garip Mevlut Turker
+
+
+1.I used the command man man to access the manual pages
+and used the search feature “/”
+to look for the word “keyword” and I found the -k option. 
+ans: man -k keyword
+
+
+2.Using the commands “which cp” and “which wc”,
+the path to the programs were displayed.  
+cp: /usr/bin/cp
+wc: /usr/bin/wc
+
+
+3.[ : No information found on man page.
+Running the whatis returns “nothing appropriate” 
+w : Found on the manual page.
+Shows who is logged on and what they are doing.
+X : Not a manual entry.
+However, using ls -l, I discovered that it is not an executable program
+but a symbolic link that points to X.org. 
+
+
+4.We use the command “ls -l /usr/bin/emacs”.
+The executable emacs appears to be a symbolic link
+that points to etc/alternatives/emacs.
+Thus, this is the file that was executed. 
+
+
+5.g+s : A file set to this when executed will have
+the permissions of the group that owns this file.
+o-x : Remove permission for other to execute/access a certain file/directory.
+Both definitions were explain by the TA during the lab session. 
+
+
+6.-ctime -21
+This answer was found by going through the man page of the find command and
+searching for the keyword “time”.
+Since 3 weeks is 21 days and ctime takes in an argument n
+that signifies the number of days we last modified the files,
+we pass in the argument “21”. 
+
+
+7.There are too many directories to list down here. 
+From the lab discussions,
+we can add a “-type” option to find to list down only directories.
+Hence, we achieve this by using the command, “find / -ctime -21 -type d”
+
+
+8.By running the command “find -type l -ls | wc -l” after navigating to /bin.
+The wc commands counts the number of lines produced by find;
+thus, giving us the total number of links which is 247,
+since each line contains one link. 
+
+
+9.The files in the directory are listed from newest to oldest
+using the command “ls /usr/bin -l -t “
+ans: libfreeblpriv3.so 
+
+
+10.From the man pages of locale,
+locale gets its data from the settings of the local environment variables.
+The files for locale are located below:  
+Archive: /usr/lib/locale/locale-archive
+Definition files: /usr/share/i18n/locales
+
+
+11.         
+buffer-menu-sort
+sort-columns
+sort-fields
+sort-lines
+sort-numeric -fields
+sort-pages
+sort-paragraphs
+sort-regexp-fields
+tabulated-list-col-sort
+tabulated-list-sort
+        
+These commands were found by executing emacs,
+running the command C-h a and then C-s “search”.
+All the commands with the keyword “sort” were returned. 
+        
+
+
+12.        
+C-M-a: beginning-of-defunc. Moves backwards to the beginning of a defunc
+C-M-b: backward-sexp. Move backward across one balanced expression
+C-M-c: exit-recursive-edit.Exit from the innermost recursive edit or minibuffer
+C-M-d: down-list. Move forward down one level of parentheses
+C-M-e: end-of-defunc. Move forward to next end of defunc
+C-M-f: forward-sexp.  Move forward across one balanced expression 
+C-M-g: No keystrokes info found
+C-M-h: mark-defunc. Put mark at end of this defunc, point at beginning.
+The defunc marked is the one that contains point or follows point. 
+
+
+The keystrokes definition were found by executing emacs,
+running the command C-h b and C-x 0 to make the new window active
+and then C-s to look for “C-M-a”.
+Since the keystrokes were arranged in alphabetical order,
+the rest of the keystrokes were found.  
+
+
+13.C-g is called a "keyboard-quit" and signals a 'quit' condition.
+During an execution of a Lisp command, the process is terminated.
+When tested in emacs, C-g also cancels partially typed commands. 
+
+
+14.Yank inserts the most recent kill,
+leaving the cursor at the end of the inserted text.
+Yanking means bringing text from the kill ring back into the buffer.
+In practical terms, yank behaves like the paste function
+that we are all familiar with. 
+The definition is found by accessing the emacs manual
+by typing C-h r and C-s “yank”. 
+
+
+15.Dired lists hidden files which in the directory /usr/bin
+are the . and the .. directory but ls -l  does not.
+Dired can be invoked by using the command “C-x-d”
+and typing in the relevant directory.
